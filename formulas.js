@@ -1,6 +1,11 @@
 "use strict"
 
-function calculoganancia(Pot) {//Calcular la ganancia en dBm
+/**
+ * Calcular la ganancia en dBm
+ * @param {*} Pot Potencia en W
+ * @returns 
+ */
+function calculoganancia(Pot) {
 
     // Formula potencia en dBm
     var gain1m = 10 * Math.log10(Pot * 10 ** 3);
@@ -10,8 +15,11 @@ function calculoganancia(Pot) {//Calcular la ganancia en dBm
     console.log(gain1m + " " + "dBm")
     return gain1m
 }
-
-function calculopotencia(gain2m, Pot_1) {// Calcular la potencia en W
+/**
+ * Calcular la potencia en W
+ * @param {*} gain2m Ganancia en dBm
+ */
+function calculopotencia(gain2m) {
 
     //Calcular la potencia a partir de ganancia dBm
     var Pot_1 = Math.pow(10, (gain2m - 30) / 10);
@@ -20,8 +28,12 @@ function calculopotencia(gain2m, Pot_1) {// Calcular la potencia en W
     // Mostrar resultado
     console.log(Pot_1 + " " + "W")
 }
-
-function calculodistanciamax(h_1, h_2) {// Calcular la distancia maxima
+/**
+ * Calcular la distancia maxima
+ * @param {*} h_1 Altura 1
+ * @param {*} h_2 Altura 2
+ */
+function calculodistanciamax(h_1, h_2) {
 
     // Calcular Dmax
     var dmax = (4.12 * (Math.sqrt(h_1) + Math.sqrt(h_2)));
@@ -39,8 +51,7 @@ function calculodistanciamax(h_1, h_2) {// Calcular la distancia maxima
  * @param {*} grx_db Ganacia del Gx en dB
  * @param {*} Potx Potencia del Tx en W
  */
-function calculoesplibre(Potx, dis, freq, gtx_db, grx_db) {// Calcular perdida de espacio libre
-
+function calculoesplibre(Potx, dis, freq, gtx_db, grx_db) {
     var gain1m = calculoganancia(Potx)
     // Ecuacion de Friis
     var Lo_db = (32.5 + 20 * Math.log10(dis) + 20 * Math.log10(freq));
