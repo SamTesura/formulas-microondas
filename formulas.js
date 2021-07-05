@@ -21,7 +21,7 @@ function calculopotencia(gain2m, Pot_1) {// Calcular la potencia en W
     console.log(Pot_1 + " " + "W")
 }
 
-function calculoalturamax(h_1, h_2) {// Calcular la altura maxima
+function calculodistanciamax(h_1, h_2) {// Calcular la distancia maxima
 
     // Calcular Dmax
     var dmax = (4.12 * (Math.sqrt(h_1) + Math.sqrt(h_2)));
