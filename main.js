@@ -76,7 +76,7 @@ function createButton(parent, label, callback) {
             val[key] = parseFloat(inputNodes[key].value);
 
         // Calcular el resultado
-        const sal =-calculoesplibre(val.p_rx, val.d, val.f, val.G_tx, val.G_rx);
+        const sal =calculoesplibre(val.p_rx, val.d, val.f, val.G_tx, val.G_rx);
 
         // Expresar el resultado en el nodo de salida <p>
         salida.textContent = `Potencia de receptor: ${sal} dBm`;
