@@ -48,7 +48,7 @@ function createButton(parent, label, callback) {
     document.body.append(container);
 
     const title = document.createElement('h1');
-    title.textContent = 'Formula espacio libre';
+    title.textContent = 'Fórmulas Microondas';
     container.append(title);
 
     // Valores de entrada
@@ -58,12 +58,11 @@ function createButton(parent, label, callback) {
         f: createInput(container, 'Frecuencia (MHz)', 'number', 1),
         G_rx: createInput(container, 'Ganancia antena Receptora', 'number', 1),
         G_tx: createInput(container, 'Ganancia antena Transmisora', 'number', 1),
-        h_1: createInput(container, 'Distancia antena Transmisora', 'number', 20),
-        h_2: createInput(container, 'Distancia antena Receptora', 'number', 10),
-
+        h_1: createInput(container, 'Altura antena Transmisora', 'number', 1),
+        h_2: createInput(container, 'Altura antena Receptora', 'number', 1),
     };
     
-    const salida = document.createElement('p');
+    const salida = document.createElement('p', 'd');
     function actualizarResultado() {
         let val = {};
 
@@ -74,19 +73,18 @@ function createButton(parent, label, callback) {
 
         // Calcular el resultado
         const sal = calculoesplibre(val.p_rx, val.d, val.f, val.G_tx, val.G_rx);
-        const sal2 = calculodistanciamax(h_1, h_2); 
-
+        const sal2 = calculoganancia(val.p_rx);
+        const sal3 = calculodismax(val.h_1, val.h_2); 
+       
         // Expresar el resultado en el nodo de salida <p>
-        salida.textContent = `Potencia de receptor: ${sal} dBm`;
-        salida.textContent = `Distancia maxima entre antenas: ${sal2} dBm`;
-
+        salida.textContent = [  ` Potencia de receptor: ${sal} dBm`, 
+                                ` Distancia maxima entre antenas: ${sal3} Km`, 
+                                ` Ganancia de la antena: ${sal2} dBm`, 
+                             ];
     }
-    actualizarResultado(); // Actualizar por primera vez
-
-    const button = createButton(container, 'Calcular potencia de receptor (dBm)', actualizarResultado);
-    const button = createButton1(container, 'Calcular la distancia máxima entre antenas', actualizarResultado);
-
-    container.append(button, salida);
-
-
-})()
+        actualizarResultado(); // Actualizar por primera vez
+        const button = createButton(container, 'Calcular potencia de receptor (dBm)', actualizarResultado);
+        const button2 = createButton(container, 'Calcular la distancia máxima entre antenas (Km)', actualizarResultado);
+        container.append(button, button2, salida);
+    }
+)()

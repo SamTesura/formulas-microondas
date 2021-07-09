@@ -33,7 +33,7 @@ function calculopotencia(gain2m) {
  * @param {*} h_1 Altura 1
  * @param {*} h_2 Altura 2
  */
-function calculodistanciamax(h_1, h_2) {
+function calculodismax(h_1, h_2) {
 
     // Calcular Dmax
     var dmax = (4.12 * (Math.sqrt(h_1) + Math.sqrt(h_2)));
