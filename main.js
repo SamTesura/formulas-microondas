@@ -28,7 +28,9 @@
             G_tx: { min: -50, max: 100, name: 'Ganancia TX' },
             h_1: { min: 0.1, max: 10000, name: 'Altura TX' },
             h_2: { min: 0.1, max: 10000, name: 'Altura RX' }
-        }
+        },
+        // Umbral de potencia recibida baja (típico límite de sensibilidad de muchos receptores)
+        LOW_RX_POWER_THRESHOLD_DBM: -100
     };
 
     // ====================================================
@@ -38,15 +40,15 @@
     /**
      * Formatea un número con decimales fijos
      */
-    function formatNumber(num, decimals = 4) {
+    const formatNumber = function(num, decimals = 4) {
         if (isNaN(num) || !isFinite(num)) return 'Error';
         return Number(num).toFixed(decimals);
-    }
+    };
 
     /**
      * Valida un valor de entrada según las reglas
      */
-    function validateInput(key, value) {
+    const validateInput = function(key, value) {
         const rule = CONFIG.validationRules[key];
         if (!rule) return { valid: true };
 
@@ -67,12 +69,12 @@
         }
 
         return { valid: true };
-    }
+    };
 
     /**
      * Crea un elemento con clases y atributos
      */
-    function createElement(tag, classes = [], attributes = {}) {
+    const createElement = function(tag, classes = [], attributes = {}) {
         const element = document.createElement(tag);
         if (classes.length > 0) {
             element.className = classes.join(' ');
@@ -81,7 +83,18 @@
             element.setAttribute(key, value);
         });
         return element;
-    }
+    };
+
+    /**
+     * Debounce function to limit the rate of function calls
+     */
+    const debounce = function(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
 
     // ====================================================
     // CONSTRUCCIÓN DE LA INTERFAZ
@@ -90,7 +103,7 @@
     /**
      * Crea la estructura principal de la aplicación
      */
-    function createMainStructure() {
+    const createMainStructure = function() {
         const container = createElement('div', ['container']);
         document.body.appendChild(container);
 
@@ -111,12 +124,12 @@
         container.appendChild(footer);
 
         return container;
-    }
+    };
 
     /**
      * Crea el encabezado de la aplicación
      */
-    function createHeader() {
+    const createHeader = function() {
         const header = createElement('header', ['header', 'fade-in']);
 
         const waveIcon = createElement('div', ['wave-icon']);
@@ -133,12 +146,12 @@
         header.appendChild(subtitle);
 
         return header;
-    }
+    };
 
     /**
      * Crea la tarjeta principal con el formulario de cálculo
      */
-    function createCalculatorCard() {
+    const createCalculatorCard = function() {
         const card = createElement('div', ['card', 'fade-in']);
 
         const cardTitle = createElement('h2', ['card-title']);
@@ -213,11 +226,11 @@
         const buttonGroup = createElement('div', ['button-group']);
 
         const calcButton = createElement('button', ['btn-primary']);
-        calcButton.innerHTML = '🧮 Calcular Todo';
+        calcButton.textContent = '🧮 Calcular Todo';
         calcButton.onclick = () => updateResults(inputNodes);
 
         const resetButton = createElement('button', ['btn-secondary']);
-        resetButton.innerHTML = '🔄 Resetear Valores';
+        resetButton.textContent = '🔄 Resetear Valores';
         resetButton.onclick = () => resetInputs(inputNodes);
 
         buttonGroup.appendChild(calcButton);
@@ -232,20 +245,20 @@
         // Calcular automáticamente al cargar
         setTimeout(() => updateResults(inputNodes), 100);
 
-        // Agregar eventos de cambio en tiempo real
+        // Agregar eventos de cambio en tiempo real con debounce
+        const debouncedUpdateResults = debounce(() => updateResults(inputNodes), 300);
+
         Object.values(inputNodes).forEach(input => {
-            input.addEventListener('input', () => {
-                setTimeout(() => updateResults(inputNodes), 300);
-            });
+            input.addEventListener('input', debouncedUpdateResults);
         });
 
         return card;
-    }
+    };
 
     /**
      * Crea un grupo de input con label, input y hint
      */
-    function createInputGroup(config, inputNodes) {
+    const createInputGroup = function(config, inputNodes) {
         const group = createElement('div', ['input-group']);
 
         const label = createElement('label');
@@ -277,12 +290,12 @@
         group.appendChild(hint);
 
         return group;
-    }
+    };
 
     /**
      * Crea la sección de información educativa
      */
-    function createInfoSection() {
+    const createInfoSection = function() {
         const section = createElement('div', ['info-section', 'fade-in']);
 
         const title = createElement('h3');
@@ -326,12 +339,12 @@
         section.appendChild(formulasDiv);
 
         return section;
-    }
+    };
 
     /**
      * Crea el pie de página
      */
-    function createFooter() {
+    const createFooter = function() {
         const footer = createElement('footer', ['footer']);
         footer.innerHTML = `
             <p>Calculadora de Microondas para Estudiantes de Ingeniería</p>
@@ -340,7 +353,7 @@
             </p>
         `;
         return footer;
-    }
+    };
 
     // ====================================================
     // LÓGICA DE CÁLCULOS Y RESULTADOS
@@ -349,7 +362,7 @@
     /**
      * Actualiza todos los resultados
      */
-    function updateResults(inputNodes) {
+    const updateResults = function(inputNodes) {
         const resultsContainer = document.getElementById('results-container');
         if (!resultsContainer) return;
 
@@ -361,16 +374,16 @@
         let hasErrors = false;
 
         for (const key in inputNodes) {
-            const value = inputNodes[key].value;
+            const {value} = inputNodes[key];
             const validation = validateInput(key, value);
 
             if (!validation.valid) {
                 showError(resultsContainer, validation.message);
                 hasErrors = true;
-                inputNodes[key].style.borderColor = 'var(--error-color)';
+                inputNodes[key].classList.add('input-error');
             } else {
                 values[key] = parseFloat(value);
-                inputNodes[key].style.borderColor = '';
+                inputNodes[key].classList.remove('input-error');
             }
         }
 
@@ -437,7 +450,7 @@
                 );
             }
 
-            if (p_rx_dbm < -100) {
+            if (p_rx_dbm < CONFIG.LOW_RX_POWER_THRESHOLD_DBM) {
                 showWarning(
                     resultsContainer,
                     `⚠️ La potencia recibida es muy baja (${formatNumber(p_rx_dbm, 2)} dBm). Considera aumentar la potencia del transmisor, las ganancias de las antenas, o reducir la distancia.`
@@ -448,12 +461,12 @@
             showError(resultsContainer, 'Error al calcular: ' + error.message);
             console.error(error);
         }
-    }
+    };
 
     /**
      * Crea un elemento de resultado
      */
-    function createResultItem(container, label, value, unit, type = '') {
+    const createResultItem = function(container, label, value, unit, type = '') {
         const item = createElement('div', ['result-item', type, 'fade-in']);
 
         const labelSpan = createElement('span', ['result-label']);
@@ -473,41 +486,52 @@
         item.appendChild(valueContainer);
 
         container.appendChild(item);
-    }
+    };
 
     /**
      * Muestra un mensaje de error
      */
-    function showError(container, message) {
+    const showError = function(container, message) {
         const errorDiv = createElement('div', ['result-item', 'fade-in']);
         errorDiv.style.borderLeftColor = 'var(--error-color)';
         errorDiv.style.background = 'rgba(239, 68, 68, 0.1)';
-        errorDiv.innerHTML = `<span style="color: var(--error-color);">❌ ${message}</span>`;
+
+        const messageSpan = createElement('span');
+        messageSpan.style.color = 'var(--error-color)';
+        messageSpan.textContent = `❌ ${message}`;
+
+        errorDiv.appendChild(messageSpan);
         container.appendChild(errorDiv);
-    }
+    };
 
     /**
      * Muestra un mensaje de advertencia
      */
-    function showWarning(container, message) {
+    const showWarning = function(container, message) {
         const warningDiv = createElement('div', ['result-item', 'warning', 'fade-in']);
         warningDiv.style.borderLeftColor = 'var(--warning-color)';
         warningDiv.style.background = 'rgba(245, 158, 11, 0.1)';
         warningDiv.style.marginTop = 'var(--spacing-lg)';
-        warningDiv.innerHTML = `<span style="color: var(--warning-color); font-size: 0.95rem;">${message}</span>`;
+
+        const messageSpan = createElement('span');
+        messageSpan.style.color = 'var(--warning-color)';
+        messageSpan.style.fontSize = '0.95rem';
+        messageSpan.textContent = message;
+
+        warningDiv.appendChild(messageSpan);
         container.appendChild(warningDiv);
-    }
+    };
 
     /**
      * Resetea todos los inputs a valores por defecto
      */
-    function resetInputs(inputNodes) {
+    const resetInputs = function(inputNodes) {
         for (const key in inputNodes) {
             inputNodes[key].value = CONFIG.defaultValues[key];
-            inputNodes[key].style.borderColor = '';
+            inputNodes[key].classList.remove('input-error');
         }
         updateResults(inputNodes);
-    }
+    };
 
     // ====================================================
     // INICIALIZACIÓN
