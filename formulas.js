@@ -30,17 +30,19 @@ function calculopotencia(gain2m) {
 }
 /**
  * Calcular la distancia maxima
- * @param {*} h_1 Altura 1
- * @param {*} h_2 Altura 2
+ * @param {*} h_1 Altura 1 en metros
+ * @param {*} h_2 Altura 2 en metros
+ * @returns {number} Distancia máxima en kilómetros
  */
 function calculodismax(h_1, h_2) {
 
-    // Calcular Dmax
+    // Calcular Dmax (horizonte de radio)
     var dmax = (4.12 * (Math.sqrt(h_1) + Math.sqrt(h_2)));
     // Convertir a flotante
     parseFloat(dmax)
     // Mostrar resultado
     console.log(dmax + " " + "Km")
+    return dmax
 }
 
 /**
