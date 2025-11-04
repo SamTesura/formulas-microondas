@@ -9,8 +9,6 @@ function calculoganancia(Pot) {
 
     // Formula potencia en dBm
     var gain1m = 10 * Math.log10(Pot * 10 ** 3);
-    // Convertir a flotante
-    parseFloat(gain1m)
     // Mostrar resultado
     console.log(gain1m + " " + "dBm")
     return gain1m
@@ -23,8 +21,6 @@ function calculopotencia(gain2m) {
 
     //Calcular la potencia a partir de ganancia dBm
     var Pot_1 = Math.pow(10, (gain2m - 30) / 10);
-    // Convertir a flotante
-    parseFloat(Pot_1)
     // Mostrar resultado
     console.log(Pot_1 + " " + "W")
 }
@@ -38,8 +34,6 @@ function calculodismax(h_1, h_2) {
 
     // Calcular Dmax (horizonte de radio)
     var dmax = (4.12 * (Math.sqrt(h_1) + Math.sqrt(h_2)));
-    // Convertir a flotante
-    parseFloat(dmax)
     // Mostrar resultado
     console.log(dmax + " " + "Km")
     return dmax

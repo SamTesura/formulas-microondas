@@ -245,6 +245,10 @@ body {
     font-style: italic;
 }
 
+.input-group input.input-error {
+    border-color: var(--error-color);
+}
+
 /* =====================================================
    BOTONES
    ===================================================== */
